@@ -81,21 +81,23 @@
 									
 								</ul>
 								<h3>Base robot choice:</h3>
-								<p>We decided to use Turtlebot because it is readily available, has all sensors for collecting needed data, 
-									and can handle required movement.
+								<p>We decided to use Turtlebot because it is readily available, has all sensors for collecting needed data, and 
+									can handle required movement. Our design choices were actually guided by the setup of the TurtleBot provided 
+									for us because of the way the LiDAR sensor and Raspi camera are placed. Since the TurtleBot is only able to move in a 
+									2D plane, we had to reconstruct our product and dependencies to only adhere to the x-y plane.
 								</p>
 								<span class="image main"><img src="images/Turtlebot.png"/></span>
 								<h3>Sensor choice:</h3>
-								<p>Since we want the product to be as modular as possible, we decided to use the built-in Raspi camera instead 
-									of an external camera as introduced in class. Doing so can help avoid wiring problems and the robot can be 
-									free from environmental dependencies (us holding the external camera or the robot can only move within the 
-									camera range if it is mounted up). This built-in camera, however, has very low resolution, so we have to use 
-									bigger AR tags as well as be mindful to not put the robot too far from the tags since it needs to detect the 
-									AR tags in order to start moving. </p>
-								<p>We decided to employ laser detection from the LiDAR sensor to detect objects in front of the Turtlebot instead 
-									of using computer vision because it is more simple and straightforward. Since we only need data of how far 
-									objects are from the robot, by doing so we can cut down on the bulk of unnecessary work and focus on perfecting 
-									the robot movement. </p>
+								<p>Since we want the product to be as modular as possible, we decided to use the built-in Raspi camera instead of an external
+									camera as introduced in class. Doing so can help avoid wiring problems and the robot can be free from 
+									environmental dependencies (us holding the external camera or the robot can only move within the camera range if it is mounted up). 
+									This built-in camera, however, has very low resolution, so we have to use bigger AR tags as well as be mindful to not put the robot 
+									too far from the tags since it needs to detect the AR tags in order to start moving. 
+									This creates another problem where having the Turtlebot too close to the pot moves the AR tags out of the camera frame. </p>
+								<p>We decided to employ laser detection from the LiDAR sensor to detect objects in front of the Turtlebot instead of using computer 
+									vision because it is more simple and straightforward. Since we only need data of how far objects are from the robot, by doing so 
+									we can cut down on the bulk of unnecessary work and focus on perfecting the robot movement.
+								</p>
 								
 								<h3>Physical design choice:</h3>
 								<p>Since the sensors are in fixed positions, we have to be very mindful in designing the physical outer layer that 
@@ -113,6 +115,26 @@
 						<!-- Implementation -->
 							<article id="implementation">
 								<h2 class="major">Implementation</h2>
+								<h3>Hardware</h3>
+								<p>
+									For the most part, we utilized hardware built into the Turtlebot (including the
+									Turtlebot itself). We used the LIDAR sensor to detect objects in the Turtlebot's path:
+								</p>
+								<span class="image main"><img src="images/LiDAR sensor.jpg"/></span>
+								<p>
+									We also used the built in Raspberry Pi camera for AR tag tracking:
+								</p>
+								<span class="image main"><img src="images/raspi camera.png"/></span>
+								<p>
+									We also 3D printed a mount for the Turtlebot to allow us to attach the water pump
+									and reservoir to the robot. We decided to go with Solidworks 2022 and used CAD to create 
+									STL files for 3D printing. We implemented a prototype mount that covers the Turtlebot 
+									but leaves space for the raspi camera line of sight. Then the nozzle is placed slightly 
+									below the liDAR sensor but tall enough to water a set of potted plants at a fixed height. 
+									We then placed water bottles at two corners of the turtleBot for water supply and drew water 
+									through a tube using a submersible DC 3V water pump. See additional materials for CAD drawings
+									and Solidworks parts.
+								</p>
 								<h3>Software</h3>
 								<p>The software we wrote consisted of two main components: 
 									first, we have a ROS node that takes in LIDAR sensor data and filters it so that we only retain 
@@ -121,7 +143,7 @@
 									all of the logic related to searching for AR tags, driving to them, and used the LIDAR information 
 									to perform the obstacle detection algorithm. It uses the ar_track_alvar package to detect AR tags. 
 									The ROS graph of our system is shown below:</p>
-								<img src="images/ros_graph.jpg" height="350" width="650">
+								<img src="images/ros_graph.jpg" height="500" width="650">
 
 								<h3>Full System Operation</h3>
 								<p>
@@ -212,7 +234,8 @@
 							<h3 class="minor">Difficulties</h3>
 							<p>While designing, we encountered many problems with the built-in Raspi camera. 
 								Calibrating and getting the desired data from this camera was very challenging, as 
-								it does not have much documentation online and the course staff were of little help. 
+								it does not have much documentation online and since it was not used in labs,
+								most people we spoke to did not have much experience working with it. 
 								Its transformation data is also not so great with different axes than the base frame, 
 								so we have to reconstruct the transformations in order to make the math work. </p>
 							<p>The LiDAR sensor being fixed at a certain height also poses complications to the objects 
@@ -226,7 +249,9 @@
 								limitation of the robot only being able to move after detecting an AR tag, which subsequently 
 								makes the robot able to avoid static and dynamic objects alike in real time. Alternatively, 
 								we can make the robot go back to its original starting point and memorize the AR tag positions 
-								so that it does not need to detect the tags when the sequence is called again.
+								so that it does not need to detect the tags when the sequence is called again. We can also make
+								the robot save the positions of the markers, so that it is able to go back to them without line
+								of sight after the first time.
 							</p>
 
 						</article>
