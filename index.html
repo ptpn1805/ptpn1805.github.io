@@ -28,6 +28,7 @@
 								<p>An autonomous robot that waters plants for you</p>
 								<p>Integrating dynamic obstacle avoidance and computer vision processing through </br>
 									data gathered from built in Raspi camera and LiDAR sensor on turtlebot</p>
+								<img src="images/Actual Design.png"/>
 						</div>
 						<nav>
 							<ul>
@@ -50,10 +51,23 @@
 						<!-- Intro -->
 							<article id="intro">
 								<h2 class="major">Intro</h2>
-								<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
-								<p>Our end goal is</p>
-								<p>It's interesting bc</p>
-								<p>Real world application</p>
+								<!-- <span class="image main"><img src="images/pic01.jpg" alt="" /></span> -->
+								<video height=350 width=550 controls=controls>
+									<source src="videos/Purpose.MOV">
+								  Your browser does not support the video tag.
+								  </video>
+
+								<p>The main goal of Planty Bot is to create an autonomous robot that can 
+									identify a plant pot, go toward it, stop right in the middle of the 
+									pot in order to water it, all while being able to avoid objects that are 
+									in its path in real time (both statically and dynamically).
+									This project is a direct solution to a real world problem, 
+									which makes it meaningful and can reach a larger set of audience 
+									who struggle with the same issue. With the system that integrates 
+									dynamic object avoidance along with computer visioning for location detecting, 
+									it has countless possibilities other than watering plants such as storage robot 
+									in warehouse that can avoid people in its path, etc.
+
 							</article>
 
 						<!-- Design -->
@@ -68,14 +82,83 @@
 							<article id="implementation">
 								<h2 class="major">Implementation</h2>
 								<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-								<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum dolor sit amet.</p>
+								<h2>Software</h2>
+								<p>The software we wrote consisted of two main components: 
+									first, we have a ROS node that takes in LIDAR sensor data and filters it so that we only retain 
+									the spatial information pertaining to the regions of interest, these being the front, left, and 
+									right sides of the Turtlebot. The second node we wrote was the main driver node, which contained 
+									all of the logic related to searching for AR tags, driving to them, and used the LIDAR information 
+									to perform the obstacle detection algorithm. It uses the ar_track_alvar package to detect AR tags. 
+									The ROS graph of our system is shown below:</p>
+								<img src="images/ros_graph.jpg" height="350" width="650">
+
+								<h2>Full System Operation</h2>
+								<p>
+									First, we need to initialize the camera. By default, the camera outputs a compressed image. 
+									To rectify the image, we need to publish our camera’s image as a raw image, thus we feed the 
+									compressed image into the image_transport node. Then we rectify the image using the image_proc node. 
+									Once we have the camera set up, the Turtlebot will rotate in place searching for the first AR tag to drive to. 
+									When it finds the AR tag, it will turn in the direction of it, and begin driving towards it. To account for noisy 
+									measurements, imperfections in the robot’s motors, and other external factors, we implemented a feedback 
+									control system so that the Turtlebot is able to correct any deviation from its path during driving. 
+									If it detects any obstacles in its way while driving (using LIDAR data from the front of the robot only) 
+									it will enter an obstacle avoidance sequence.
+								</p>
+								<p>
+									In the obstacle avoidance sequence, it will use LIDAR data to determine open space around the obstacle. 
+									It will then determine whether to move to the left or right of the obstacle. If there is space on both sides, 
+									it will determine whether the left or right space is closer to the Turtlebot. Once a direction is chosen it 
+									will turn in that direction and continue moving until it can no longer detect the object in its path using 
+									LIDAR data from the left/right sides (depending on which direction it's moving). Then it will turn back in the 
+									direction of the AR tag and continue moving forward. If at any point during this sequence it detects another 
+									obstacle, it will perform the same algorithm again. 
+								</p>
+								<p>
+									Finally, once the Turtlebot reaches the plant pot, it will stop for some period of time to 
+									water the plant (the watering was not implemented in this project), then reverse and look for the next AR tag to 
+									drive to. The process is repeated until all the specified plants have been watered. 
+								</p>
+								<p>
+									Overall, our system is modeled and implemented as a finite state machine which is illustrated below:
+								</p>
+								<span class="image main"><img src="images/fsm1.jpg"/></span>
+								<!-- <span class="image main"><img src="images/ros_graph.jpg"/></span> -->
 							</article>
 
 						<!-- Results -->
 						<article id="results">
+							<p>
+								Our project was able to track multiple AR tags and orient itself towards the pot plant reliably. 
+								Also, it was able to detect and avoid obstacles that are in its way when placed before it in real time.
+								When it deviated from its course, it was able to correct itself with the feedback control.
+								Below are some of the tasks the project can perform as well as the fully integrated system.
+							</p>
 							<h2 class="major">Results</h2>
-							<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-							<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum dolor sit amet.</p>
+							<!-- <span class="image main"><img src="images/pic03.jpg" alt="" /></span> -->
+							<h3>Single AR tag tracking</h3>
+							<video height=350 width=550 controls=controls muted>
+								<source src="videos/AR_tag_detection(1).MOV">
+							  Your browser does not support the video tag.
+							</video>
+							<h3>Multiple AR tag tracking</h3>
+							<video height=350 width=550 controls=controls muted>
+								<source src="videos/AR_tags_detection(2).MOV">
+							  Your browser does not support the video tag.
+							</video>
+							<h3>Obstacle Avoidance</h3>
+							<video height=350 width=550 controls=controls muted>
+								<source src="videos/Obstacle_avoidance_P2.MOV">
+							  Your browser does not support the video tag.
+							</video>
+							<h3>Fully Integrated System</h3>
+							<video height=350 width=550 controls=controls muted>
+								<source src="videos/integrated1.mov">
+							  Your browser does not support the video tag.
+							</video>
+							<video height=350 width=550 controls=controls muted>
+								<source src="videos/integrated2.MOV">
+							  Your browser does not support the video tag.
+							</video>
 						</article>
 
 						<!-- Conclusion -->
