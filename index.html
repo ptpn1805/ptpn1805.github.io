@@ -73,16 +73,47 @@
 						<!-- Design -->
 							<article id="design">
 								<h2 class="major">Design</h2>
-								<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
-								<p>Adipiscing magna sed dolor elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices.</p>
-								<p>Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus pharetra. Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus amet feugiat tempus.</p>
+								<h3>Design Criteria: </h3>
+								<ul>
+									<li>Use computer vision to detect an AR tag and identify it as the final location (the plant pot)</li>
+									<li>Use LIDAR sensor to create a shortest path to the pot while avoiding all obstacles based on the sensor inputs </li>
+									<li>Stop and turn on water pump when reach desired location</li>
+									
+								</ul>
+								<h3>Base robot choice:</h3>
+								<p>We decided to use Turtlebot because it is readily available, has all sensors for collecting needed data, 
+									and can handle required movement.
+								</p>
+								<span class="image main"><img src="images/Turtlebot.png"/></span>
+								<h3>Sensor choice:</h3>
+								<p>Since we want the product to be as modular as possible, we decided to use the built-in Raspi camera instead 
+									of an external camera as introduced in class. Doing so can help avoid wiring problems and the robot can be 
+									free from environmental dependencies (us holding the external camera or the robot can only move within the 
+									camera range if it is mounted up). This built-in camera, however, has very low resolution, so we have to use 
+									bigger AR tags as well as be mindful to not put the robot too far from the tags since it needs to detect the 
+									AR tags in order to start moving. </p>
+								<p>We decided to employ laser detection from the LiDAR sensor to detect objects in front of the Turtlebot instead 
+									of using computer vision because it is more simple and straightforward. Since we only need data of how far 
+									objects are from the robot, by doing so we can cut down on the bulk of unnecessary work and focus on perfecting 
+									the robot movement. </p>
+								
+								<h3>Physical design choice:</h3>
+								<p>Since the sensors are in fixed positions, we have to be very mindful in designing the physical outer layer that 
+									holds the water bottle and the tube so that it does not obstruct any of the sensors. We decided to make 2 water 
+									bottle holders in the back so that the water weight can be evenly distributed. The front is made solid with only 
+									an opening for the camera so that we can prevent any water splashing into the robot boards due to the open form 
+									factor. The water tube is designed to be as low as possible in order to stay clear from the LiDAR sensor, while 
+									still ensuring that the water can be dispensed at the middle of the robot since we program the robot to hit the 
+									pot (AR tag) head on. This brings the problem of the water tube being shorter than the AR tag, which hinders the 
+									watering process. This can be fixed by making new AR tags with suitable height and recalibrating the camera. 
+								</p>
+								<span class="image main"><img src="images/CAD_original.png"/></span>
 							</article>
 
 						<!-- Implementation -->
 							<article id="implementation">
 								<h2 class="major">Implementation</h2>
-								<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-								<h2>Software</h2>
+								<h3>Software</h3>
 								<p>The software we wrote consisted of two main components: 
 									first, we have a ROS node that takes in LIDAR sensor data and filters it so that we only retain 
 									the spatial information pertaining to the regions of interest, these being the front, left, and 
@@ -92,7 +123,7 @@
 									The ROS graph of our system is shown below:</p>
 								<img src="images/ros_graph.jpg" height="350" width="650">
 
-								<h2>Full System Operation</h2>
+								<h3>Full System Operation</h3>
 								<p>
 									First, we need to initialize the camera. By default, the camera outputs a compressed image. 
 									To rectify the image, we need to publish our camera’s image as a raw image, thus we feed the 
@@ -127,14 +158,14 @@
 
 						<!-- Results -->
 						<article id="results">
+							<h2 class="major">Results</h2>
+							<!-- <span class="image main"><img src="images/pic03.jpg" alt="" /></span> -->
 							<p>
 								Our project was able to track multiple AR tags and orient itself towards the pot plant reliably. 
 								Also, it was able to detect and avoid obstacles that are in its way when placed before it in real time.
 								When it deviated from its course, it was able to correct itself with the feedback control.
 								Below are some of the tasks the project can perform as well as the fully integrated system.
 							</p>
-							<h2 class="major">Results</h2>
-							<!-- <span class="image main"><img src="images/pic03.jpg" alt="" /></span> -->
 							<h3>Single AR tag tracking</h3>
 							<video height=350 width=550 controls=controls muted>
 								<source src="videos/AR_tag_detection(1).MOV">
@@ -164,33 +195,78 @@
 						<!-- Conclusion -->
 						<article id="conclusion">
 							<h2 class="major">Conclusion</h2>
-							<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-							<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum dolor sit amet.</p>
+							<p>Technically, our finished solution is a fair compromise between our design criteria. 
+								Since the robot has to detect the AR tag in order to start moving, we can only have 
+								dynamic obstacles (obstacles that move into its path) instead of static obstacles 
+								that block line of sight to the AR tag. Despite this drawback, we still decided to 
+								go with this logic because we are able to get the robot to detect multiple AR tags 
+								while still preserving the object detection property of the robot, which makes it 
+								more functional in real world usage. In the future, we can combine the current 
+								functionality with a strategy where the robot maps the room to take note of static 
+								obstacles, and the locations of the AR tags, and can then drive to these tags without 
+								seeing them. Once it has line of sight of the AR tag, it can then use the tracking 
+								algorithm to position itself more accurately with respect to the pot. We also cannot 
+								meet the watering criteria for this project, since we cannot interact with the Raspberry 
+								board in order to get the power needed for the power pump. This can be done easily with 
+								hardware freedom and our product remains very functional with its core tasks. </p>
+							<h3 class="minor">Difficulties</h3>
+							<p>While designing, we encountered many problems with the built-in Raspi camera. 
+								Calibrating and getting the desired data from this camera was very challenging, as 
+								it does not have much documentation online and the course staff were of little help. 
+								Its transformation data is also not so great with different axes than the base frame, 
+								so we have to reconstruct the transformations in order to make the math work. </p>
+							<p>The LiDAR sensor being fixed at a certain height also poses complications to the objects 
+								in which it can detect. If an object does not have relatively uniform size such as a 
+								swivel chair, the LiDAR sensor cannot detect the intruding portion of the object that 
+								is lower than its laser level, hence making the data faulty. We have to be mindful and 
+								use relatively same size objects at all height levels so that the data can be as accurate 
+								as possible, which might not be the case for the real world. </p>
+							<h3 class="minor">Improvement</h3>
+							<p> Being able to prescan the room and import that map into the system would get rid of the 
+								limitation of the robot only being able to move after detecting an AR tag, which subsequently 
+								makes the robot able to avoid static and dynamic objects alike in real time. Alternatively, 
+								we can make the robot go back to its original starting point and memorize the AR tag positions 
+								so that it does not need to detect the tags when the sequence is called again.
+							</p>
+
 						</article>
 
 						<!-- Team -->
 						<article id="team">
 							<h2 class="major">Team</h2>
 							
-							<img src="images/pic03.jpg" alt="" class="avatar"/></a>
+							<img src="images/brandontran.png" alt="" class="avatar"/></a>
 							<h3 class="minor">Brandon Tran</h3>
-							<p>Short bio</p>
-							<p>Major contributions</p>
+							<p>I am a 4th year undergraduate student with an EECS major. I have prior experience in 
+								EECS149 which involved computer vision with AR tag tracking. I also work well in 
+								programming languages so I was able to implement nodes and algorithms necessary for 
+								the Turtlebot to path plan and avoid obstacles using the data provided.
+							</p>
 
-							<img src="images/pic03.jpg" alt="" class="avatar"/></a>
+							<img src="images/nhiphan.png" alt="" class="avatar"/></a>
 							<h3 class="minor">Nhi Phan</h3>
-							<p>Short bio</p>
-							<p>Major contributions</p>
+							<p>I am a 4th year undergraduate student with a Mechanical Engineering major. I have software 
+								experience with C++, Python as well as fabrication processes. I also understand and handle 
+								IoT, Mechatronics, CAD and Matlab programming. I helped with designing and constructing 
+								the robot as well as creating packages and launch files necessary for our robot.
+							</p>
 
-							<img src="images/pic03.jpg" alt="" class="avatar"/></a>
+							<img src="images/pic02.jpg" alt="" class="avatar"/></a>
 							<h3 class="minor">Noah Bernstein</h3>
-							<p>Short bio</p>
-							<p>Major contributions</p>
+							<p>I am a 4th year undergraduate student with an EECS major. I work mainly with C++, Python, and 
+								Java but also have experience working with robotics companies over the summer. I have plenty 
+								of prior software experience and programming so I was tasked with designing and implementing 
+								back end software pipelines. 
+							</p>
 
-							<img src="images/pic03.jpg" alt="" class="avatar"/></a>
+							<img src="images/wayne.png" alt="" class="avatar"/></a>
 							<h3 class="minor">Wayne Toh</h3>
-							<p>Short bio</p>
-							<p>Major contributions</p>
+							<p>I am a 4th year undergraduate student with a Mechanical Engineering major. I mostly have experience 
+								in SOLIDWORKS, ANSYS, Matlab, AutoCAD with background in manufacturing, control and dynamics. I have 
+								also taken classes in MEMS, IoT, Woodwork, and Mechatronics. I was put in charge of designing and 
+								constructing the mount of the plant watering robot using CAD and also worked on arithmetical 
+								calculations for path planning and orientation of the robot. 
+							</p>
 						</article>
 
 						<!-- Additional materials -->
